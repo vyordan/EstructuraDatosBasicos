@@ -1,13 +1,21 @@
-# interfaz_estructuras.py
+# interfaz_estructuras_grafica.py
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
-import estructuras  # Este es el módulo compilado con pybind11
+import estructuras  # Módulo compilado con pybind11
+import math
 
-class AplicacionEstructuras:
+class AplicacionEstructurasGrafica:
     def __init__(self, root):
         self.root = root
-        self.root.title("Estructuras de Datos - Pila, Cola, Listas")
-        self.root.geometry("900x700")
+        self.root.title("Estructuras de Datos - Visualización Gráfica")
+        self.root.geometry("1200x800")
+        
+        # Colores para los nodos
+        self.colores = [
+            "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD",
+            "#D4A5A5", "#9B59B6", "#3498DB", "#E67E22", "#2ECC71",
+            "#F1C40F", "#E74C3C", "#1ABC9C", "#9B59B6", "#34495E"
+        ]
         
         # Crear las estructuras de datos
         self.pila = estructuras.Pila()
@@ -17,98 +25,128 @@ class AplicacionEstructuras:
         
         self.estructura_actual = None
         self.nombre_estructura = ""
+        self.nodos_graficos = []  # Para almacenar los elementos gráficos
         
         self.crear_interfaz()
         
     def crear_interfaz(self):
         # Frame principal
         main_frame = ttk.Frame(self.root, padding="10")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.pack(fill=tk.BOTH, expand=True)
         
         # Título
-        titulo = ttk.Label(main_frame, text="ESTRUCTURAS DE DATOS", font=("Arial", 16, "bold"))
-        titulo.grid(row=0, column=0, columnspan=3, pady=10)
+        titulo = ttk.Label(main_frame, text="ESTRUCTURAS DE DATOS - VISUALIZACIÓN GRÁFICA", 
+                          font=("Arial", 16, "bold"))
+        titulo.pack(pady=10)
+        
+        # Frame superior para controles
+        frame_superior = ttk.Frame(main_frame)
+        frame_superior.pack(fill=tk.X, pady=5)
         
         # Frame para selección de estructura
-        frame_seleccion = ttk.LabelFrame(main_frame, text="Seleccionar Estructura", padding="10")
-        frame_seleccion.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+        frame_seleccion = ttk.LabelFrame(frame_superior, text="Seleccionar Estructura", padding="10")
+        frame_seleccion.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         
-        ttk.Button(frame_seleccion, text="Pila", 
-                  command=lambda: self.seleccionar_estructura("pila")).grid(row=0, column=0, padx=5)
-        ttk.Button(frame_seleccion, text="Cola", 
-                  command=lambda: self.seleccionar_estructura("cola")).grid(row=0, column=1, padx=5)
-        ttk.Button(frame_seleccion, text="Lista Simple", 
-                  command=lambda: self.seleccionar_estructura("lista_simple")).grid(row=0, column=2, padx=5)
-        ttk.Button(frame_seleccion, text="Lista Doble", 
-                  command=lambda: self.seleccionar_estructura("lista_doble")).grid(row=0, column=3, padx=5)
+        botones_estructura = ttk.Frame(frame_seleccion)
+        botones_estructura.pack()
         
-        self.label_estructura = ttk.Label(frame_seleccion, text="Estructura seleccionada: Ninguna", font=("Arial", 10, "bold"))
-        self.label_estructura.grid(row=1, column=0, columnspan=4, pady=5)
+        ttk.Button(botones_estructura, text="Pila", 
+                  command=lambda: self.seleccionar_estructura("pila")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(botones_estructura, text="Cola", 
+                  command=lambda: self.seleccionar_estructura("cola")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(botones_estructura, text="Lista Simple", 
+                  command=lambda: self.seleccionar_estructura("lista_simple")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(botones_estructura, text="Lista Doble", 
+                  command=lambda: self.seleccionar_estructura("lista_doble")).pack(side=tk.LEFT, padx=5)
+        
+        self.label_estructura = ttk.Label(frame_seleccion, 
+                                         text="Estructura seleccionada: Ninguna",
+                                         font=("Arial", 10, "bold"))
+        self.label_estructura.pack(pady=5)
         
         # Frame para operaciones
-        frame_operaciones = ttk.LabelFrame(main_frame, text="Operaciones", padding="10")
-        frame_operaciones.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=5)
+        frame_operaciones = ttk.LabelFrame(frame_superior, text="Operaciones", padding="10")
+        frame_operaciones.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=5)
         
-        # Entrada de valor
-        ttk.Label(frame_operaciones, text="Valor:").grid(row=0, column=0, padx=5)
-        self.entry_valor = ttk.Entry(frame_operaciones, width=15)
-        self.entry_valor.grid(row=0, column=1, padx=5)
+        # Entradas
+        entrada_frame = ttk.Frame(frame_operaciones)
+        entrada_frame.pack(pady=5)
         
-        # Botones de operaciones básicas
-        self.btn_insertar = ttk.Button(frame_operaciones, text="Insertar", 
-                                       command=self.insertar, state=tk.DISABLED)
-        self.btn_insertar.grid(row=1, column=0, padx=5, pady=5)
+        ttk.Label(entrada_frame, text="Valor:").pack(side=tk.LEFT, padx=5)
+        self.entry_valor = ttk.Entry(entrada_frame, width=10)
+        self.entry_valor.pack(side=tk.LEFT, padx=5)
         
-        self.btn_eliminar = ttk.Button(frame_operaciones, text="Eliminar", 
-                                       command=self.eliminar, state=tk.DISABLED)
-        self.btn_eliminar.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(entrada_frame, text="Posición:").pack(side=tk.LEFT, padx=5)
+        self.entry_posicion = ttk.Entry(entrada_frame, width=8)
+        self.entry_posicion.pack(side=tk.LEFT, padx=5)
         
-        self.btn_buscar = ttk.Button(frame_operaciones, text="Buscar", 
-                                     command=self.buscar, state=tk.DISABLED)
-        self.btn_buscar.grid(row=1, column=2, padx=5, pady=5)
+        # Botones
+        botones1 = ttk.Frame(frame_operaciones)
+        botones1.pack(pady=5)
         
-        self.btn_mostrar = ttk.Button(frame_operaciones, text="Mostrar Todo", 
-                                      command=self.mostrar, state=tk.DISABLED)
-        self.btn_mostrar.grid(row=2, column=0, padx=5, pady=5)
+        self.btn_insertar = ttk.Button(botones1, text="Insertar", 
+                                       command=self.insertar, state=tk.DISABLED, width=15)
+        self.btn_insertar.pack(side=tk.LEFT, padx=5)
         
-        self.btn_vaciar = ttk.Button(frame_operaciones, text="Vaciar", 
-                                     command=self.vaciar, state=tk.DISABLED)
-        self.btn_vaciar.grid(row=2, column=1, padx=5, pady=5)
+        self.btn_eliminar = ttk.Button(botones1, text="Eliminar", 
+                                       command=self.eliminar, state=tk.DISABLED, width=15)
+        self.btn_eliminar.pack(side=tk.LEFT, padx=5)
         
-        # Posición para listas
-        ttk.Label(frame_operaciones, text="Posición:").grid(row=0, column=2, padx=5)
-        self.entry_posicion = ttk.Entry(frame_operaciones, width=10)
-        self.entry_posicion.grid(row=0, column=3, padx=5)
+        self.btn_buscar = ttk.Button(botones1, text="Buscar", 
+                                     command=self.buscar, state=tk.DISABLED, width=15)
+        self.btn_buscar.pack(side=tk.LEFT, padx=5)
         
-        self.btn_insertar_pos = ttk.Button(frame_operaciones, text="Insertar en Posición", 
-                                          command=self.insertar_posicion, state=tk.DISABLED)
-        self.btn_insertar_pos.grid(row=1, column=3, padx=5, pady=5)
+        botones2 = ttk.Frame(frame_operaciones)
+        botones2.pack(pady=5)
         
-        self.btn_obtener_pos = ttk.Button(frame_operaciones, text="Obtener de Posición", 
-                                         command=self.obtener_posicion, state=tk.DISABLED)
-        self.btn_obtener_pos.grid(row=2, column=3, padx=5, pady=5)
+        self.btn_mostrar = ttk.Button(botones2, text="Mostrar", 
+                                      command=self.mostrar, state=tk.DISABLED, width=15)
+        self.btn_mostrar.pack(side=tk.LEFT, padx=5)
         
-        # Frame para mostrar resultados
-        frame_resultado = ttk.LabelFrame(main_frame, text="Resultados", padding="10")
-        frame_resultado.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        self.btn_insertar_pos = ttk.Button(botones2, text="Insertar en Pos", 
+                                          command=self.insertar_posicion, state=tk.DISABLED, width=15)
+        self.btn_insertar_pos.pack(side=tk.LEFT, padx=5)
         
-        self.text_resultado = scrolledtext.ScrolledText(frame_resultado, width=80, height=15)
-        self.text_resultado.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        self.btn_obtener_pos = ttk.Button(botones2, text="Obtener de Pos", 
+                                         command=self.obtener_posicion, state=tk.DISABLED, width=15)
+        self.btn_obtener_pos.pack(side=tk.LEFT, padx=5)
         
-        # Botón de limpiar
-        ttk.Button(frame_resultado, text="Limpiar Resultados", 
-                  command=self.limpiar_resultados).grid(row=1, column=0, pady=5)
+        self.btn_vaciar = ttk.Button(botones2, text="Vaciar", 
+                                     command=self.vaciar, state=tk.DISABLED, width=15)
+        self.btn_vaciar.pack(side=tk.LEFT, padx=5)
         
-        # Configurar grid weights
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-        main_frame.columnconfigure(0, weight=1)
-        main_frame.columnconfigure(1, weight=1)
-        main_frame.columnconfigure(2, weight=1)
-        main_frame.rowconfigure(3, weight=1)
-        frame_resultado.columnconfigure(0, weight=1)
-        frame_resultado.rowconfigure(0, weight=1)
+        # Frame principal con canvas y texto
+        frame_principal = ttk.Frame(main_frame)
+        frame_principal.pack(fill=tk.BOTH, expand=True, pady=10)
         
+        # Canvas para la representación gráfica
+        frame_canvas = ttk.LabelFrame(frame_principal, text="Visualización Gráfica", padding="5")
+        frame_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
+        
+        self.canvas = tk.Canvas(frame_canvas, bg="white", height=400, width=700)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Scrollbars para el canvas
+        h_scrollbar = ttk.Scrollbar(frame_canvas, orient=tk.HORIZONTAL, command=self.canvas.xview)
+        h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        v_scrollbar = ttk.Scrollbar(frame_canvas, orient=tk.VERTICAL, command=self.canvas.yview)
+        v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
+        self.canvas.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        
+        # Frame para resultados en texto
+        frame_texto = ttk.LabelFrame(frame_principal, text="Resultados", padding="5")
+        frame_texto.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=5)
+        
+        self.text_resultado = scrolledtext.ScrolledText(frame_texto, width=40, height=20, 
+                                                        font=("Consolas", 10))
+        self.text_resultado.pack(fill=tk.BOTH, expand=True)
+        
+        # Botón limpiar
+        ttk.Button(frame_texto, text="Limpiar Resultados", 
+                  command=self.limpiar_resultados).pack(pady=5)
+    
     def seleccionar_estructura(self, tipo):
         if tipo == "pila":
             self.estructura_actual = self.pila
@@ -149,19 +187,255 @@ class AplicacionEstructuras:
         self.btn_mostrar.config(state=tk.NORMAL)
         self.btn_vaciar.config(state=tk.NORMAL)
         self.mostrar()
+    
+    def dibujar_estructura(self):
+        """Dibuja la estructura actual en el canvas"""
+        self.canvas.delete("all")
         
+        if self.estructura_actual is None:
+            return
+        
+        # Obtener los elementos de la estructura
+        if self.nombre_estructura == "Pila":
+            elementos = self.obtener_elementos_pila()
+            self.dibujar_pila(elementos)
+        elif self.nombre_estructura == "Cola":
+            elementos = self.obtener_elementos_cola()
+            self.dibujar_cola(elementos)
+        elif self.nombre_estructura == "Lista Simple":
+            elementos = self.obtener_elementos_lista()
+            self.dibujar_lista_simple(elementos)
+        elif self.nombre_estructura == "Lista Doble":
+            elementos = self.obtener_elementos_lista()
+            self.dibujar_lista_doble(elementos)
+        
+        # Actualizar scroll region
+        self.canvas.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+    
+    def obtener_elementos_pila(self):
+        """Obtiene los elementos de la pila en orden (de cima a base)"""
+        elementos = []
+        # Como no podemos acceder directamente a los nodos, usamos el método mostrar
+        # y parseamos el resultado
+        mostrar_str = self.estructura_actual.mostrar()
+        if mostrar_str and mostrar_str != "Pila vacía" and mostrar_str != "":
+            # El método mostrar de la pila devuelve los elementos separados por espacios
+            # con la cima al final
+            nums = mostrar_str.strip().split()
+            elementos = [int(n) for n in nums]
+        return elementos
+    
+    def obtener_elementos_cola(self):
+        """Obtiene los elementos de la cola en orden (de frente a fin)"""
+        elementos = []
+        mostrar_str = self.estructura_actual.mostrar()
+        if mostrar_str and mostrar_str != "Cola vacía" and mostrar_str != "":
+            nums = mostrar_str.strip().split()
+            elementos = [int(n) for n in nums]
+        return elementos
+    
+    def obtener_elementos_lista(self):
+        """Obtiene los elementos de la lista"""
+        elementos = []
+        mostrar_str = self.estructura_actual.mostrar()
+        if mostrar_str and mostrar_str != "Lista vacía" and mostrar_str != "":
+            nums = mostrar_str.strip().split()
+            elementos = [int(n) for n in nums]
+        return elementos
+    
+    def dibujar_pila(self, elementos):
+        """Dibuja una pila verticalmente"""
+        if not elementos:
+            self.canvas.create_text(400, 200, text="Pila vacía", font=("Arial", 14), fill="gray")
+            return
+        
+        x_centro = 400
+        y_inicio = 500
+        ancho = 80
+        alto = 40
+        separacion = 10
+        
+        for i, valor in enumerate(reversed(elementos)):
+            y = y_inicio - (i * (alto + separacion))
+            color = self.colores[i % len(self.colores)]
+            
+            # Dibujar nodo
+            self.canvas.create_rectangle(x_centro - ancho//2, y - alto//2,
+                                        x_centro + ancho//2, y + alto//2,
+                                        fill=color, outline="black", width=2)
+            
+            # Texto del valor
+            self.canvas.create_text(x_centro, y, text=str(valor), 
+                                   font=("Arial", 12, "bold"))
+            
+            # Indicador de cima para el primer elemento
+            if i == 0:
+                self.canvas.create_text(x_centro + ancho//2 + 20, y, 
+                                       text="↑ CIMA", font=("Arial", 10, "bold"), 
+                                       fill="red", anchor="w")
+    
+    def dibujar_cola(self, elementos):
+        """Dibuja una cola horizontalmente"""
+        if not elementos:
+            self.canvas.create_text(400, 200, text="Cola vacía", font=("Arial", 14), fill="gray")
+            return
+        
+        x_inicio = 200
+        y_centro = 250
+        ancho = 70
+        alto = 40
+        separacion = 80
+        
+        for i, valor in enumerate(elementos):
+            x = x_inicio + i * separacion
+            color = self.colores[i % len(self.colores)]
+            
+            # Dibujar nodo
+            self.canvas.create_rectangle(x - ancho//2, y_centro - alto//2,
+                                        x + ancho//2, y_centro + alto//2,
+                                        fill=color, outline="black", width=2)
+            
+            # Texto del valor
+            self.canvas.create_text(x, y_centro, text=str(valor), 
+                                   font=("Arial", 12, "bold"))
+            
+            # Flecha al siguiente
+            if i < len(elementos) - 1:
+                x_sig = x_inicio + (i + 1) * separacion
+                self.dibujar_flecha(x + ancho//2, y_centro, x_sig - ancho//2, y_centro)
+            
+            # Indicadores
+            if i == 0:
+                self.canvas.create_text(x - ancho//2 - 20, y_centro, 
+                                       text="FRENTE →", font=("Arial", 10, "bold"), 
+                                       fill="blue", anchor="e")
+            if i == len(elementos) - 1:
+                self.canvas.create_text(x + ancho//2 + 20, y_centro, 
+                                       text="← FIN", font=("Arial", 10, "bold"), 
+                                       fill="green", anchor="w")
+    
+    def dibujar_lista_simple(self, elementos):
+        """Dibuja una lista simple horizontalmente con flechas"""
+        if not elementos:
+            self.canvas.create_text(400, 200, text="Lista vacía", font=("Arial", 14), fill="gray")
+            return
+        
+        x_inicio = 150
+        y_centro = 250
+        ancho = 70
+        alto = 40
+        separacion = 100
+        
+        for i, valor in enumerate(elementos):
+            x = x_inicio + i * separacion
+            color = self.colores[i % len(self.colores)]
+            
+            # Dibujar nodo (con espacio para la flecha)
+            self.canvas.create_rectangle(x - ancho//2, y_centro - alto//2,
+                                        x + ancho//2, y_centro + alto//2,
+                                        fill=color, outline="black", width=2)
+            
+            # Texto del valor
+            self.canvas.create_text(x, y_centro, text=str(valor), 
+                                   font=("Arial", 12, "bold"))
+            
+            # Dibujar "siguiente" (puntero)
+            self.canvas.create_rectangle(x + ancho//2 - 15, y_centro - 10,
+                                        x + ancho//2 - 5, y_centro + 10,
+                                        fill="lightgray", outline="gray")
+            
+            # Flecha al siguiente
+            if i < len(elementos) - 1:
+                x_sig = x_inicio + (i + 1) * separacion
+                self.dibujar_flecha(x + ancho//2 - 5, y_centro, x_sig - ancho//2 + 15, y_centro)
+            
+            # Indicador de cabeza
+            if i == 0:
+                self.canvas.create_text(x - ancho//2 - 20, y_centro - 30, 
+                                       text="CABEZA", font=("Arial", 10, "bold"), 
+                                       fill="purple")
+                self.canvas.create_line(x - ancho//2, y_centro - 20, 
+                                       x - ancho//2, y_centro - 10,
+                                       arrow=tk.LAST, fill="purple")
+    
+    def dibujar_lista_doble(self, elementos):
+        """Dibuja una lista doble con flechas en ambos sentidos"""
+        if not elementos:
+            self.canvas.create_text(400, 200, text="Lista vacía", font=("Arial", 14), fill="gray")
+            return
+        
+        x_inicio = 150
+        y_centro = 250
+        ancho = 80
+        alto = 50
+        separacion = 120
+        
+        for i, valor in enumerate(elementos):
+            x = x_inicio + i * separacion
+            color = self.colores[i % len(self.colores)]
+            
+            # Dibujar nodo
+            self.canvas.create_rectangle(x - ancho//2, y_centro - alto//2,
+                                        x + ancho//2, y_centro + alto//2,
+                                        fill=color, outline="black", width=2)
+            
+            # Texto del valor
+            self.canvas.create_text(x, y_centro, text=str(valor), 
+                                   font=("Arial", 12, "bold"))
+            
+            # Dibujar punteros siguiente/anterior
+            self.canvas.create_rectangle(x + ancho//2 - 20, y_centro - 20,
+                                        x + ancho//2 - 5, y_centro - 5,
+                                        fill="lightblue", outline="blue")
+            self.canvas.create_text(x + ancho//2 - 12, y_centro - 12, 
+                                   text="→", font=("Arial", 8))
+            
+            self.canvas.create_rectangle(x - ancho//2 + 5, y_centro + 5,
+                                        x - ancho//2 + 20, y_centro + 20,
+                                        fill="lightgreen", outline="green")
+            self.canvas.create_text(x - ancho//2 + 12, y_centro + 12, 
+                                   text="←", font=("Arial", 8))
+            
+            # Flechas
+            if i < len(elementos) - 1:
+                x_sig = x_inicio + (i + 1) * separacion
+                # Flecha siguiente
+                self.dibujar_flecha(x + ancho//2 - 5, y_centro - 12, 
+                                   x_sig - ancho//2 + 20, y_centro - 12, "blue")
+                # Flecha anterior (de vuelta)
+                self.dibujar_flecha(x_sig - ancho//2 + 20, y_centro + 12, 
+                                   x + ancho//2 - 5, y_centro + 12, "green", invertida=True)
+            
+            # Indicadores
+            if i == 0:
+                self.canvas.create_text(x - ancho//2 - 30, y_centro - 30, 
+                                       text="CABEZA", font=("Arial", 10, "bold"), 
+                                       fill="purple")
+            if i == len(elementos) - 1:
+                self.canvas.create_text(x + ancho//2 + 30, y_centro - 30, 
+                                       text="COLA", font=("Arial", 10, "bold"), 
+                                       fill="orange")
+    
+    def dibujar_flecha(self, x1, y1, x2, y2, color="black", invertida=False):
+        """Dibuja una flecha entre dos puntos"""
+        if invertida:
+            self.canvas.create_line(x1, y1, x2, y2, arrow=tk.FIRST, fill=color, width=2)
+        else:
+            self.canvas.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill=color, width=2)
+    
     def insertar(self):
         try:
             valor = int(self.entry_valor.get())
             if self.nombre_estructura == "Pila":
                 self.estructura_actual.apilar(valor)
-                self.mostrar_mensaje(f"Apilado: {valor}")
+                self.mostrar_mensaje(f"✅ Apilado: {valor}")
             elif self.nombre_estructura == "Cola":
                 self.estructura_actual.encolar(valor)
-                self.mostrar_mensaje(f"Encolado: {valor}")
+                self.mostrar_mensaje(f"✅ Encolado: {valor}")
             else:  # Listas
                 self.estructura_actual.insertar_final(valor)
-                self.mostrar_mensaje(f"Insertado: {valor} al final")
+                self.mostrar_mensaje(f"✅ Insertado: {valor} al final")
             
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
@@ -169,27 +443,27 @@ class AplicacionEstructuras:
             messagebox.showerror("Error", "Ingrese un valor numérico válido")
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def eliminar(self):
         try:
             if self.nombre_estructura == "Pila":
                 if not self.estructura_actual.esta_vacia():
                     valor = self.estructura_actual.desapilar()
-                    self.mostrar_mensaje(f"Desapilado: {valor}")
+                    self.mostrar_mensaje(f"✅ Desapilado: {valor}")
                 else:
                     messagebox.showwarning("Advertencia", "La pila está vacía")
             elif self.nombre_estructura == "Cola":
                 if not self.estructura_actual.esta_vacia():
                     valor = self.estructura_actual.desencolar()
-                    self.mostrar_mensaje(f"Desencolado: {valor}")
+                    self.mostrar_mensaje(f"✅ Desencolado: {valor}")
                 else:
                     messagebox.showwarning("Advertencia", "La cola está vacía")
             else:  # Listas
                 valor = int(self.entry_valor.get())
                 if self.estructura_actual.eliminar(valor):
-                    self.mostrar_mensaje(f"Eliminado: {valor}")
+                    self.mostrar_mensaje(f"✅ Eliminado: {valor}")
                 else:
-                    messagebox.showinfo("Info", f"Valor {valor} no encontrado")
+                    messagebox.showinfo("Info", f"❌ Valor {valor} no encontrado")
             
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
@@ -198,20 +472,21 @@ class AplicacionEstructuras:
                 messagebox.showerror("Error", "Ingrese un valor numérico para eliminar")
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def buscar(self):
         try:
             valor = int(self.entry_valor.get())
             encontrado = self.estructura_actual.buscar(valor)
             if encontrado:
-                self.mostrar_mensaje(f"Valor {valor} ENCONTRADO en la {self.nombre_estructura}")
+                self.mostrar_mensaje(f"✅ Valor {valor} ENCONTRADO en la {self.nombre_estructura}")
+                # Resaltar el nodo encontrado (esto requeriría acceso a los nodos)
             else:
-                self.mostrar_mensaje(f"Valor {valor} NO encontrado en la {self.nombre_estructura}")
+                self.mostrar_mensaje(f"❌ Valor {valor} NO encontrado en la {self.nombre_estructura}")
         except ValueError:
             messagebox.showerror("Error", "Ingrese un valor numérico para buscar")
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def insertar_posicion(self):
         if self.nombre_estructura not in ["Lista Simple", "Lista Doble"]:
             return
@@ -220,7 +495,7 @@ class AplicacionEstructuras:
             valor = int(self.entry_valor.get())
             posicion = int(self.entry_posicion.get())
             self.estructura_actual.insertar_en_posicion(valor, posicion)
-            self.mostrar_mensaje(f"Insertado {valor} en posición {posicion}")
+            self.mostrar_mensaje(f"✅ Insertado {valor} en posición {posicion}")
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
             self.entry_posicion.delete(0, tk.END)
@@ -228,7 +503,7 @@ class AplicacionEstructuras:
             messagebox.showerror("Error", "Ingrese valores numéricos válidos")
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def obtener_posicion(self):
         if self.nombre_estructura not in ["Lista Simple", "Lista Doble"]:
             return
@@ -236,32 +511,45 @@ class AplicacionEstructuras:
         try:
             posicion = int(self.entry_posicion.get())
             valor = self.estructura_actual.obtener(posicion)
-            self.mostrar_mensaje(f"En posición {posicion}: {valor}")
+            self.mostrar_mensaje(f"📌 En posición {posicion}: {valor}")
             self.entry_posicion.delete(0, tk.END)
         except ValueError:
             messagebox.showerror("Error", "Ingrese una posición numérica válida")
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def mostrar(self):
+        """Muestra la estructura en texto y gráficamente"""
         try:
-            contenido = ""
+            # Mostrar en texto
             if self.nombre_estructura == "Pila":
                 contenido = self.estructura_actual.mostrar()
+                if not contenido:
+                    contenido = "Pila vacía"
             elif self.nombre_estructura == "Cola":
                 contenido = self.estructura_actual.mostrar()
+                if not contenido:
+                    contenido = "Cola vacía"
             elif self.nombre_estructura == "Lista Simple":
                 contenido = self.estructura_actual.mostrar()
+                if not contenido:
+                    contenido = "Lista vacía"
             elif self.nombre_estructura == "Lista Doble":
                 contenido = self.estructura_actual.mostrar_adelante()
+                if not contenido:
+                    contenido = "Lista vacía"
             
             self.text_resultado.delete(1.0, tk.END)
-            self.text_resultado.insert(tk.END, f"{self.nombre_estructura}:\n")
+            self.text_resultado.insert(tk.END, f"📊 {self.nombre_estructura}:\n")
             self.text_resultado.insert(tk.END, f"Elementos: {contenido}\n")
             self.text_resultado.insert(tk.END, f"Tamaño: {self.estructura_actual.tamano()}")
+            
+            # Dibujar gráficamente
+            self.dibujar_estructura()
+            
         except Exception as e:
             messagebox.showerror("Error", str(e))
-            
+    
     def vaciar(self):
         if messagebox.askyesno("Confirmar", f"¿Vaciar la {self.nombre_estructura}?"):
             if self.nombre_estructura == "Pila":
@@ -278,16 +566,16 @@ class AplicacionEstructuras:
                 self.estructura_actual = self.lista_doble
             
             self.mostrar()
-            self.mostrar_mensaje(f"{self.nombre_estructura} vaciada")
-            
+            self.mostrar_mensaje(f"🧹 {self.nombre_estructura} vaciada")
+    
     def mostrar_mensaje(self, mensaje):
         self.text_resultado.insert(tk.END, f"\n> {mensaje}")
         self.text_resultado.see(tk.END)
-        
+    
     def limpiar_resultados(self):
         self.text_resultado.delete(1.0, tk.END)
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = AplicacionEstructuras(root)
+    app = AplicacionEstructurasGrafica(root)
     root.mainloop()
