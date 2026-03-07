@@ -80,40 +80,40 @@ class AplicacionEstructurasGrafica:
         self.entry_posicion = ttk.Entry(entrada_frame, width=8)
         self.entry_posicion.pack(side=tk.LEFT, padx=5)
         
-        # Botones
+        # Botones - Distribución mejorada
         botones1 = ttk.Frame(frame_operaciones)
         botones1.pack(pady=5)
         
         self.btn_insertar = ttk.Button(botones1, text="Insertar", 
-                                       command=self.insertar, state=tk.DISABLED, width=15)
-        self.btn_insertar.pack(side=tk.LEFT, padx=5)
+                                       command=self.insertar, state=tk.DISABLED, width=12)
+        self.btn_insertar.pack(side=tk.LEFT, padx=3)
         
         self.btn_eliminar = ttk.Button(botones1, text="Eliminar", 
-                                       command=self.eliminar, state=tk.DISABLED, width=15)
-        self.btn_eliminar.pack(side=tk.LEFT, padx=5)
+                                       command=self.eliminar, state=tk.DISABLED, width=12)
+        self.btn_eliminar.pack(side=tk.LEFT, padx=3)
         
         self.btn_buscar = ttk.Button(botones1, text="Buscar", 
-                                     command=self.buscar, state=tk.DISABLED, width=15)
-        self.btn_buscar.pack(side=tk.LEFT, padx=5)
+                                     command=self.buscar, state=tk.DISABLED, width=12)
+        self.btn_buscar.pack(side=tk.LEFT, padx=3)
         
+        self.btn_vaciar = ttk.Button(botones1, text="Vaciar", 
+                                     command=self.vaciar, state=tk.DISABLED, width=12)
+        self.btn_vaciar.pack(side=tk.LEFT, padx=3)
+        
+        # Segunda fila de botones
         botones2 = ttk.Frame(frame_operaciones)
         botones2.pack(pady=5)
         
-        self.btn_mostrar = ttk.Button(botones2, text="Mostrar", 
-                                      command=self.mostrar, state=tk.DISABLED, width=15)
-        self.btn_mostrar.pack(side=tk.LEFT, padx=5)
-        
         self.btn_insertar_pos = ttk.Button(botones2, text="Insertar en Pos", 
                                           command=self.insertar_posicion, state=tk.DISABLED, width=15)
-        self.btn_insertar_pos.pack(side=tk.LEFT, padx=5)
+        self.btn_insertar_pos.pack(side=tk.LEFT, padx=3)
         
         self.btn_obtener_pos = ttk.Button(botones2, text="Obtener de Pos", 
                                          command=self.obtener_posicion, state=tk.DISABLED, width=15)
-        self.btn_obtener_pos.pack(side=tk.LEFT, padx=5)
+        self.btn_obtener_pos.pack(side=tk.LEFT, padx=3)
         
-        self.btn_vaciar = ttk.Button(botones2, text="Vaciar", 
-                                     command=self.vaciar, state=tk.DISABLED, width=15)
-        self.btn_vaciar.pack(side=tk.LEFT, padx=5)
+        self.label_info = ttk.Label(frame_operaciones, text="", foreground="blue")
+        self.label_info.pack(pady=2)
         
         # Frame principal con canvas y texto
         frame_principal = ttk.Frame(main_frame)
@@ -154,37 +154,44 @@ class AplicacionEstructurasGrafica:
             self.btn_insertar.config(text="Apilar")
             self.btn_eliminar.config(text="Desapilar")
             self.btn_buscar.config(state=tk.NORMAL)
+            self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.DISABLED)
             self.btn_obtener_pos.config(state=tk.DISABLED)
+            self.label_info.config(text="📌 Pilas: LIFO (Last In, First Out)")
         elif tipo == "cola":
             self.estructura_actual = self.cola
             self.nombre_estructura = "Cola"
             self.btn_insertar.config(text="Encolar")
             self.btn_eliminar.config(text="Desencolar")
             self.btn_buscar.config(state=tk.NORMAL)
+            self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.DISABLED)
             self.btn_obtener_pos.config(state=tk.DISABLED)
+            self.label_info.config(text="📌 Colas: FIFO (First In, First Out)")
         elif tipo == "lista_simple":
             self.estructura_actual = self.lista_simple
             self.nombre_estructura = "Lista Simple"
             self.btn_insertar.config(text="Insertar Final")
             self.btn_eliminar.config(text="Eliminar")
             self.btn_buscar.config(state=tk.NORMAL)
+            self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.NORMAL)
             self.btn_obtener_pos.config(state=tk.NORMAL)
+            self.label_info.config(text="📌 Lista Simple: punteros solo hacia adelante")
         elif tipo == "lista_doble":
             self.estructura_actual = self.lista_doble
             self.nombre_estructura = "Lista Doble"
             self.btn_insertar.config(text="Insertar Final")
             self.btn_eliminar.config(text="Eliminar")
             self.btn_buscar.config(state=tk.NORMAL)
+            self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.NORMAL)
             self.btn_obtener_pos.config(state=tk.NORMAL)
+            self.label_info.config(text="📌 Lista Doble: punteros hacia adelante y atrás")
         
         self.label_estructura.config(text=f"Estructura seleccionada: {self.nombre_estructura}")
         self.btn_insertar.config(state=tk.NORMAL)
         self.btn_eliminar.config(state=tk.NORMAL)
-        self.btn_mostrar.config(state=tk.NORMAL)
         self.btn_vaciar.config(state=tk.NORMAL)
         self.mostrar()
     
@@ -203,10 +210,10 @@ class AplicacionEstructurasGrafica:
             elementos = self.obtener_elementos_cola()
             self.dibujar_cola(elementos)
         elif self.nombre_estructura == "Lista Simple":
-            elementos = self.obtener_elementos_lista()
+            elementos = self.obtener_elementos_lista_simple()
             self.dibujar_lista_simple(elementos)
         elif self.nombre_estructura == "Lista Doble":
-            elementos = self.obtener_elementos_lista()
+            elementos = self.obtener_elementos_lista_doble()  # Función específica para lista doble
             self.dibujar_lista_doble(elementos)
         
         # Actualizar scroll region
@@ -214,34 +221,69 @@ class AplicacionEstructurasGrafica:
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     
     def obtener_elementos_pila(self):
-        """Obtiene los elementos de la pila en orden (de cima a base)"""
+        """Obtiene los elementos de la pila"""
         elementos = []
-        # Como no podemos acceder directamente a los nodos, usamos el método mostrar
-        # y parseamos el resultado
-        mostrar_str = self.estructura_actual.mostrar()
-        if mostrar_str and mostrar_str != "Pila vacía" and mostrar_str != "":
-            # El método mostrar de la pila devuelve los elementos separados por espacios
-            # con la cima al final
-            nums = mostrar_str.strip().split()
-            elementos = [int(n) for n in nums]
+        try:
+            mostrar_str = self.estructura_actual.mostrar()
+            if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                nums = mostrar_str.strip().split()
+                elementos = [int(n) for n in nums if n.strip()]
+        except:
+            pass
         return elementos
     
     def obtener_elementos_cola(self):
-        """Obtiene los elementos de la cola en orden (de frente a fin)"""
+        """Obtiene los elementos de la cola"""
         elementos = []
-        mostrar_str = self.estructura_actual.mostrar()
-        if mostrar_str and mostrar_str != "Cola vacía" and mostrar_str != "":
-            nums = mostrar_str.strip().split()
-            elementos = [int(n) for n in nums]
+        try:
+            mostrar_str = self.estructura_actual.mostrar()
+            if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                nums = mostrar_str.strip().split()
+                elementos = [int(n) for n in nums if n.strip()]
+        except:
+            pass
         return elementos
     
-    def obtener_elementos_lista(self):
-        """Obtiene los elementos de la lista"""
+    def obtener_elementos_lista_simple(self):
+        """Obtiene los elementos de la lista simple"""
         elementos = []
-        mostrar_str = self.estructura_actual.mostrar()
-        if mostrar_str and mostrar_str != "Lista vacía" and mostrar_str != "":
-            nums = mostrar_str.strip().split()
-            elementos = [int(n) for n in nums]
+        try:
+            mostrar_str = self.estructura_actual.mostrar()
+            if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                nums = mostrar_str.strip().split()
+                elementos = [int(n) for n in nums if n.strip()]
+        except:
+            pass
+        return elementos
+    
+    def obtener_elementos_lista_doble(self):
+        """Obtiene los elementos de la lista doble - VERSIÓN CORREGIDA"""
+        elementos = []
+        try:
+            # Intentar con mostrar_adelante primero
+            mostrar_str = self.estructura_actual.mostrar_adelante()
+            if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                nums = mostrar_str.strip().split()
+                elementos = [int(n) for n in nums if n.strip()]
+            else:
+                # Si no funciona, intentar con mostrar normal
+                mostrar_str = self.estructura_actual.mostrar()
+                if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                    nums = mostrar_str.strip().split()
+                    elementos = [int(n) for n in nums if n.strip()]
+        except Exception as e:
+            print(f"Error obteniendo elementos de lista doble: {e}")
+            # Último recurso: intentar obtener elemento por elemento
+            try:
+                tam = self.estructura_actual.tamano()
+                for i in range(tam):
+                    try:
+                        val = self.estructura_actual.obtener(i)
+                        elementos.append(val)
+                    except:
+                        pass
+            except:
+                pass
         return elementos
     
     def dibujar_pila(self, elementos):
@@ -331,7 +373,7 @@ class AplicacionEstructurasGrafica:
             x = x_inicio + i * separacion
             color = self.colores[i % len(self.colores)]
             
-            # Dibujar nodo (con espacio para la flecha)
+            # Dibujar nodo
             self.canvas.create_rectangle(x - ancho//2, y_centro - alto//2,
                                         x + ancho//2, y_centro + alto//2,
                                         fill=color, outline="black", width=2)
@@ -360,22 +402,23 @@ class AplicacionEstructurasGrafica:
                                        arrow=tk.LAST, fill="purple")
     
     def dibujar_lista_doble(self, elementos):
-        """Dibuja una lista doble con flechas en ambos sentidos"""
+        """Dibuja una lista doble con flechas en ambos sentidos - VERSIÓN CORREGIDA"""
         if not elementos:
             self.canvas.create_text(400, 200, text="Lista vacía", font=("Arial", 14), fill="gray")
             return
         
-        x_inicio = 150
+        # Ajustar posición inicial según cantidad de elementos
+        x_inicio = max(150, 400 - (len(elementos) * 60))
         y_centro = 250
-        ancho = 80
-        alto = 50
-        separacion = 120
+        ancho = 70
+        alto = 45
+        separacion = 90
         
         for i, valor in enumerate(elementos):
             x = x_inicio + i * separacion
             color = self.colores[i % len(self.colores)]
             
-            # Dibujar nodo
+            # Dibujar nodo principal
             self.canvas.create_rectangle(x - ancho//2, y_centro - alto//2,
                                         x + ancho//2, y_centro + alto//2,
                                         fill=color, outline="black", width=2)
@@ -384,38 +427,50 @@ class AplicacionEstructurasGrafica:
             self.canvas.create_text(x, y_centro, text=str(valor), 
                                    font=("Arial", 12, "bold"))
             
-            # Dibujar punteros siguiente/anterior
-            self.canvas.create_rectangle(x + ancho//2 - 20, y_centro - 20,
+            # Dibujar puntero siguiente (en la parte superior derecha)
+            self.canvas.create_rectangle(x + ancho//2 - 15, y_centro - 20,
                                         x + ancho//2 - 5, y_centro - 5,
                                         fill="lightblue", outline="blue")
-            self.canvas.create_text(x + ancho//2 - 12, y_centro - 12, 
-                                   text="→", font=("Arial", 8))
+            self.canvas.create_text(x + ancho//2 - 10, y_centro - 12, 
+                                   text="→", font=("Arial", 8, "bold"))
             
+            # Dibujar puntero anterior (en la parte inferior izquierda)
             self.canvas.create_rectangle(x - ancho//2 + 5, y_centro + 5,
-                                        x - ancho//2 + 20, y_centro + 20,
+                                        x - ancho//2 + 15, y_centro + 20,
                                         fill="lightgreen", outline="green")
-            self.canvas.create_text(x - ancho//2 + 12, y_centro + 12, 
-                                   text="←", font=("Arial", 8))
+            self.canvas.create_text(x - ancho//2 + 10, y_centro + 12, 
+                                   text="←", font=("Arial", 8, "bold"))
             
-            # Flechas
+            # Flechas de conexión
             if i < len(elementos) - 1:
                 x_sig = x_inicio + (i + 1) * separacion
-                # Flecha siguiente
-                self.dibujar_flecha(x + ancho//2 - 5, y_centro - 12, 
-                                   x_sig - ancho//2 + 20, y_centro - 12, "blue")
-                # Flecha anterior (de vuelta)
-                self.dibujar_flecha(x_sig - ancho//2 + 20, y_centro + 12, 
-                                   x + ancho//2 - 5, y_centro + 12, "green", invertida=True)
+                
+                # Flecha siguiente (azul) - de este nodo al siguiente
+                self.canvas.create_line(x + ancho//2 - 5, y_centro - 12,
+                                       x_sig - ancho//2 + 5, y_centro - 12,
+                                       arrow=tk.LAST, fill="blue", width=2)
+                
+                # Flecha anterior (verde) - del siguiente a este
+                self.canvas.create_line(x_sig - ancho//2 + 5, y_centro + 12,
+                                       x + ancho//2 - 5, y_centro + 12,
+                                       arrow=tk.LAST, fill="green", width=2)
             
-            # Indicadores
+            # Indicadores de cabeza y cola
             if i == 0:
                 self.canvas.create_text(x - ancho//2 - 30, y_centro - 30, 
                                        text="CABEZA", font=("Arial", 10, "bold"), 
                                        fill="purple")
+                self.canvas.create_line(x - ancho//2, y_centro - 20, 
+                                       x - ancho//2, y_centro - 10,
+                                       arrow=tk.LAST, fill="purple", width=2)
+            
             if i == len(elementos) - 1:
                 self.canvas.create_text(x + ancho//2 + 30, y_centro - 30, 
                                        text="COLA", font=("Arial", 10, "bold"), 
                                        fill="orange")
+                self.canvas.create_line(x + ancho//2, y_centro - 20, 
+                                       x + ancho//2, y_centro - 10,
+                                       arrow=tk.LAST, fill="orange", width=2)
     
     def dibujar_flecha(self, x1, y1, x2, y2, color="black", invertida=False):
         """Dibuja una flecha entre dos puntos"""
@@ -479,7 +534,6 @@ class AplicacionEstructurasGrafica:
             encontrado = self.estructura_actual.buscar(valor)
             if encontrado:
                 self.mostrar_mensaje(f"✅ Valor {valor} ENCONTRADO en la {self.nombre_estructura}")
-                # Resaltar el nodo encontrado (esto requeriría acceso a los nodos)
             else:
                 self.mostrar_mensaje(f"❌ Valor {valor} NO encontrado en la {self.nombre_estructura}")
         except ValueError:
@@ -535,9 +589,14 @@ class AplicacionEstructurasGrafica:
                 if not contenido:
                     contenido = "Lista vacía"
             elif self.nombre_estructura == "Lista Doble":
-                contenido = self.estructura_actual.mostrar_adelante()
-                if not contenido:
-                    contenido = "Lista vacía"
+                try:
+                    contenido = self.estructura_actual.mostrar_adelante()
+                    if not contenido:
+                        contenido = "Lista vacía"
+                except:
+                    contenido = self.estructura_actual.mostrar()
+                    if not contenido:
+                        contenido = "Lista vacía"
             
             self.text_resultado.delete(1.0, tk.END)
             self.text_resultado.insert(tk.END, f"📊 {self.nombre_estructura}:\n")
