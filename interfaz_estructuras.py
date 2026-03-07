@@ -35,7 +35,7 @@ class AplicacionEstructurasGrafica:
         main_frame.pack(fill=tk.BOTH, expand=True)
         
         # Título
-        titulo = ttk.Label(main_frame, text="ESTRUCTURAS DE DATOS - VISUALIZACIÓN GRÁFICA", 
+        titulo = ttk.Label(main_frame, text="ESTRUCTURAS DE DATOS - VISUALIZACIÓN GRAFICA", 
                           font=("Arial", 16, "bold"))
         titulo.pack(pady=10)
         
@@ -76,11 +76,11 @@ class AplicacionEstructurasGrafica:
         self.entry_valor = ttk.Entry(entrada_frame, width=10)
         self.entry_valor.pack(side=tk.LEFT, padx=5)
         
-        ttk.Label(entrada_frame, text="Posición:").pack(side=tk.LEFT, padx=5)
+        ttk.Label(entrada_frame, text="Posicion:").pack(side=tk.LEFT, padx=5)
         self.entry_posicion = ttk.Entry(entrada_frame, width=8)
         self.entry_posicion.pack(side=tk.LEFT, padx=5)
         
-        # Botones - Distribución mejorada
+        # Botones - Distribucion mejorada
         botones1 = ttk.Frame(frame_operaciones)
         botones1.pack(pady=5)
         
@@ -119,8 +119,8 @@ class AplicacionEstructurasGrafica:
         frame_principal = ttk.Frame(main_frame)
         frame_principal.pack(fill=tk.BOTH, expand=True, pady=10)
         
-        # Canvas para la representación gráfica
-        frame_canvas = ttk.LabelFrame(frame_principal, text="Visualización Gráfica", padding="5")
+        # Canvas para la representacion grafica
+        frame_canvas = ttk.LabelFrame(frame_principal, text="Visualizacion Grafica", padding="5")
         frame_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
         
         self.canvas = tk.Canvas(frame_canvas, bg="white", height=400, width=700)
@@ -143,7 +143,7 @@ class AplicacionEstructurasGrafica:
                                                         font=("Consolas", 10))
         self.text_resultado.pack(fill=tk.BOTH, expand=True)
         
-        # Botón limpiar
+        # Boton limpiar
         ttk.Button(frame_texto, text="Limpiar Resultados", 
                   command=self.limpiar_resultados).pack(pady=5)
     
@@ -157,7 +157,7 @@ class AplicacionEstructurasGrafica:
             self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.DISABLED)
             self.btn_obtener_pos.config(state=tk.DISABLED)
-            self.label_info.config(text="📌 Pilas: LIFO (Last In, First Out)")
+            self.label_info.config(text="Pilas: LIFO (Last In, First Out) - La cima es el ultimo elemento")
         elif tipo == "cola":
             self.estructura_actual = self.cola
             self.nombre_estructura = "Cola"
@@ -167,7 +167,7 @@ class AplicacionEstructurasGrafica:
             self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.DISABLED)
             self.btn_obtener_pos.config(state=tk.DISABLED)
-            self.label_info.config(text="📌 Colas: FIFO (First In, First Out)")
+            self.label_info.config(text="Colas: FIFO (First In, First Out)")
         elif tipo == "lista_simple":
             self.estructura_actual = self.lista_simple
             self.nombre_estructura = "Lista Simple"
@@ -177,7 +177,7 @@ class AplicacionEstructurasGrafica:
             self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.NORMAL)
             self.btn_obtener_pos.config(state=tk.NORMAL)
-            self.label_info.config(text="📌 Lista Simple: punteros solo hacia adelante")
+            self.label_info.config(text="Lista Simple: punteros solo hacia adelante")
         elif tipo == "lista_doble":
             self.estructura_actual = self.lista_doble
             self.nombre_estructura = "Lista Doble"
@@ -187,7 +187,7 @@ class AplicacionEstructurasGrafica:
             self.btn_vaciar.config(state=tk.NORMAL)
             self.btn_insertar_pos.config(state=tk.NORMAL)
             self.btn_obtener_pos.config(state=tk.NORMAL)
-            self.label_info.config(text="📌 Lista Doble: punteros hacia adelante y atrás")
+            self.label_info.config(text="Lista Doble: punteros hacia adelante y atras")
         
         self.label_estructura.config(text=f"Estructura seleccionada: {self.nombre_estructura}")
         self.btn_insertar.config(state=tk.NORMAL)
@@ -213,7 +213,7 @@ class AplicacionEstructurasGrafica:
             elementos = self.obtener_elementos_lista_simple()
             self.dibujar_lista_simple(elementos)
         elif self.nombre_estructura == "Lista Doble":
-            elementos = self.obtener_elementos_lista_doble()  # Función específica para lista doble
+            elementos = self.obtener_elementos_lista_doble()
             self.dibujar_lista_doble(elementos)
         
         # Actualizar scroll region
@@ -226,6 +226,8 @@ class AplicacionEstructurasGrafica:
         try:
             mostrar_str = self.estructura_actual.mostrar()
             if mostrar_str and isinstance(mostrar_str, str) and mostrar_str.strip():
+                # La pila en C++ devuelve: "cima ... base" o "base ... cima"?
+                # Asumimos que muestra desde la base hasta la cima
                 nums = mostrar_str.strip().split()
                 elementos = [int(n) for n in nums if n.strip()]
         except:
@@ -257,7 +259,7 @@ class AplicacionEstructurasGrafica:
         return elementos
     
     def obtener_elementos_lista_doble(self):
-        """Obtiene los elementos de la lista doble - VERSIÓN CORREGIDA"""
+        """Obtiene los elementos de la lista doble"""
         elementos = []
         try:
             # Intentar con mostrar_adelante primero
@@ -272,8 +274,7 @@ class AplicacionEstructurasGrafica:
                     nums = mostrar_str.strip().split()
                     elementos = [int(n) for n in nums if n.strip()]
         except Exception as e:
-            print(f"Error obteniendo elementos de lista doble: {e}")
-            # Último recurso: intentar obtener elemento por elemento
+            # Ultimo recurso: intentar obtener elemento por elemento
             try:
                 tam = self.estructura_actual.tamano()
                 for i in range(tam):
@@ -287,19 +288,22 @@ class AplicacionEstructurasGrafica:
         return elementos
     
     def dibujar_pila(self, elementos):
-        """Dibuja una pila verticalmente"""
+        """Dibuja una pila verticalmente - CORREGIDO: la cima va arriba"""
         if not elementos:
-            self.canvas.create_text(400, 200, text="Pila vacía", font=("Arial", 14), fill="gray")
+            self.canvas.create_text(400, 200, text="Pila vacia", font=("Arial", 14), fill="gray")
             return
         
         x_centro = 400
-        y_inicio = 500
+        y_inicio = 200  # Comenzar desde arriba
         ancho = 80
         alto = 40
         separacion = 10
         
-        for i, valor in enumerate(reversed(elementos)):
-            y = y_inicio - (i * (alto + separacion))
+        # Los elementos vienen en orden: [base, ... , cima] o [cima, ... , base]?
+        # Asumimos que vienen desde la base hasta la cima
+        # Si vienen al reves, usamos elementos directamente
+        for i, valor in enumerate(elementos):
+            y = y_inicio + i * (alto + separacion)
             color = self.colores[i % len(self.colores)]
             
             # Dibujar nodo
@@ -311,16 +315,21 @@ class AplicacionEstructurasGrafica:
             self.canvas.create_text(x_centro, y, text=str(valor), 
                                    font=("Arial", 12, "bold"))
             
-            # Indicador de cima para el primer elemento
-            if i == 0:
+            # Indicador de cima para el ULTIMO elemento (el de abajo si es LIFO?)
+            if i == len(elementos) - 1:
                 self.canvas.create_text(x_centro + ancho//2 + 20, y, 
-                                       text="↑ CIMA", font=("Arial", 10, "bold"), 
+                                       text="CIMA", font=("Arial", 10, "bold"), 
                                        fill="red", anchor="w")
+            # Indicador de base para el primer elemento
+            if i == 0:
+                self.canvas.create_text(x_centro - ancho//2 - 20, y, 
+                                       text="BASE", font=("Arial", 10, "bold"), 
+                                       fill="blue", anchor="e")
     
     def dibujar_cola(self, elementos):
         """Dibuja una cola horizontalmente"""
         if not elementos:
-            self.canvas.create_text(400, 200, text="Cola vacía", font=("Arial", 14), fill="gray")
+            self.canvas.create_text(400, 200, text="Cola vacia", font=("Arial", 14), fill="gray")
             return
         
         x_inicio = 200
@@ -350,17 +359,17 @@ class AplicacionEstructurasGrafica:
             # Indicadores
             if i == 0:
                 self.canvas.create_text(x - ancho//2 - 20, y_centro, 
-                                       text="FRENTE →", font=("Arial", 10, "bold"), 
+                                       text="FRENTE", font=("Arial", 10, "bold"), 
                                        fill="blue", anchor="e")
             if i == len(elementos) - 1:
                 self.canvas.create_text(x + ancho//2 + 20, y_centro, 
-                                       text="← FIN", font=("Arial", 10, "bold"), 
+                                       text="FIN", font=("Arial", 10, "bold"), 
                                        fill="green", anchor="w")
     
     def dibujar_lista_simple(self, elementos):
         """Dibuja una lista simple horizontalmente con flechas"""
         if not elementos:
-            self.canvas.create_text(400, 200, text="Lista vacía", font=("Arial", 14), fill="gray")
+            self.canvas.create_text(400, 200, text="Lista vacia", font=("Arial", 14), fill="gray")
             return
         
         x_inicio = 150
@@ -402,12 +411,12 @@ class AplicacionEstructurasGrafica:
                                        arrow=tk.LAST, fill="purple")
     
     def dibujar_lista_doble(self, elementos):
-        """Dibuja una lista doble con flechas en ambos sentidos - VERSIÓN CORREGIDA"""
+        """Dibuja una lista doble con flechas en ambos sentidos"""
         if not elementos:
-            self.canvas.create_text(400, 200, text="Lista vacía", font=("Arial", 14), fill="gray")
+            self.canvas.create_text(400, 200, text="Lista vacia", font=("Arial", 14), fill="gray")
             return
         
-        # Ajustar posición inicial según cantidad de elementos
+        # Ajustar posicion inicial segun cantidad de elementos
         x_inicio = max(150, 400 - (len(elementos) * 60))
         y_centro = 250
         ancho = 70
@@ -441,7 +450,7 @@ class AplicacionEstructurasGrafica:
             self.canvas.create_text(x - ancho//2 + 10, y_centro + 12, 
                                    text="←", font=("Arial", 8, "bold"))
             
-            # Flechas de conexión
+            # Flechas de conexion
             if i < len(elementos) - 1:
                 x_sig = x_inicio + (i + 1) * separacion
                 
@@ -484,18 +493,18 @@ class AplicacionEstructurasGrafica:
             valor = int(self.entry_valor.get())
             if self.nombre_estructura == "Pila":
                 self.estructura_actual.apilar(valor)
-                self.mostrar_mensaje(f" Apilado: {valor}")
+                self.mostrar_mensaje(f"Apilado: {valor}")
             elif self.nombre_estructura == "Cola":
                 self.estructura_actual.encolar(valor)
-                self.mostrar_mensaje(f" Encolado: {valor}")
+                self.mostrar_mensaje(f"Encolado: {valor}")
             else:  # Listas
                 self.estructura_actual.insertar_final(valor)
-                self.mostrar_mensaje(f" Insertado: {valor} al final")
+                self.mostrar_mensaje(f"Insertado: {valor} al final")
             
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
         except ValueError:
-            messagebox.showerror("Error", "Ingrese un valor numérico válido")
+            messagebox.showerror("Error", "Ingrese un valor numerico valido")
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
@@ -504,27 +513,27 @@ class AplicacionEstructurasGrafica:
             if self.nombre_estructura == "Pila":
                 if not self.estructura_actual.esta_vacia():
                     valor = self.estructura_actual.desapilar()
-                    self.mostrar_mensaje(f"✅ Desapilado: {valor}")
+                    self.mostrar_mensaje(f"Desapilado: {valor}")
                 else:
-                    messagebox.showwarning("Advertencia", "La pila está vacía")
+                    messagebox.showwarning("Advertencia", "La pila esta vacia")
             elif self.nombre_estructura == "Cola":
                 if not self.estructura_actual.esta_vacia():
                     valor = self.estructura_actual.desencolar()
-                    self.mostrar_mensaje(f"✅ Desencolado: {valor}")
+                    self.mostrar_mensaje(f"Desencolado: {valor}")
                 else:
-                    messagebox.showwarning("Advertencia", "La cola está vacía")
+                    messagebox.showwarning("Advertencia", "La cola esta vacia")
             else:  # Listas
                 valor = int(self.entry_valor.get())
                 if self.estructura_actual.eliminar(valor):
-                    self.mostrar_mensaje(f"✅ Eliminado: {valor}")
+                    self.mostrar_mensaje(f"Eliminado: {valor}")
                 else:
-                    messagebox.showinfo("Info", f"❌ Valor {valor} no encontrado")
+                    messagebox.showinfo("Info", f"Valor {valor} no encontrado")
             
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
         except ValueError:
             if self.nombre_estructura in ["Lista Simple", "Lista Doble"]:
-                messagebox.showerror("Error", "Ingrese un valor numérico para eliminar")
+                messagebox.showerror("Error", "Ingrese un valor numerico para eliminar")
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
@@ -533,11 +542,11 @@ class AplicacionEstructurasGrafica:
             valor = int(self.entry_valor.get())
             encontrado = self.estructura_actual.buscar(valor)
             if encontrado:
-                self.mostrar_mensaje(f"✅ Valor {valor} ENCONTRADO en la {self.nombre_estructura}")
+                self.mostrar_mensaje(f"Valor {valor} ENCONTRADO en la {self.nombre_estructura}")
             else:
-                self.mostrar_mensaje(f"❌ Valor {valor} NO encontrado en la {self.nombre_estructura}")
+                self.mostrar_mensaje(f"Valor {valor} NO encontrado en la {self.nombre_estructura}")
         except ValueError:
-            messagebox.showerror("Error", "Ingrese un valor numérico para buscar")
+            messagebox.showerror("Error", "Ingrese un valor numerico para buscar")
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
@@ -549,12 +558,12 @@ class AplicacionEstructurasGrafica:
             valor = int(self.entry_valor.get())
             posicion = int(self.entry_posicion.get())
             self.estructura_actual.insertar_en_posicion(valor, posicion)
-            self.mostrar_mensaje(f"✅ Insertado {valor} en posición {posicion}")
+            self.mostrar_mensaje(f"Insertado {valor} en posicion {posicion}")
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
             self.entry_posicion.delete(0, tk.END)
         except ValueError:
-            messagebox.showerror("Error", "Ingrese valores numéricos válidos")
+            messagebox.showerror("Error", "Ingrese valores numericos validos")
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
@@ -565,45 +574,45 @@ class AplicacionEstructurasGrafica:
         try:
             posicion = int(self.entry_posicion.get())
             valor = self.estructura_actual.obtener(posicion)
-            self.mostrar_mensaje(f"📌 En posición {posicion}: {valor}")
+            self.mostrar_mensaje(f"En posicion {posicion}: {valor}")
             self.entry_posicion.delete(0, tk.END)
         except ValueError:
-            messagebox.showerror("Error", "Ingrese una posición numérica válida")
+            messagebox.showerror("Error", "Ingrese una posicion numerica valida")
         except Exception as e:
             messagebox.showerror("Error", str(e))
     
     def mostrar(self):
-        """Muestra la estructura en texto y gráficamente"""
+        """Muestra la estructura en texto y graficamente"""
         try:
             # Mostrar en texto
             if self.nombre_estructura == "Pila":
                 contenido = self.estructura_actual.mostrar()
                 if not contenido:
-                    contenido = "Pila vacía"
+                    contenido = "Pila vacia"
             elif self.nombre_estructura == "Cola":
                 contenido = self.estructura_actual.mostrar()
                 if not contenido:
-                    contenido = "Cola vacía"
+                    contenido = "Cola vacia"
             elif self.nombre_estructura == "Lista Simple":
                 contenido = self.estructura_actual.mostrar()
                 if not contenido:
-                    contenido = "Lista vacía"
+                    contenido = "Lista vacia"
             elif self.nombre_estructura == "Lista Doble":
                 try:
                     contenido = self.estructura_actual.mostrar_adelante()
                     if not contenido:
-                        contenido = "Lista vacía"
+                        contenido = "Lista vacia"
                 except:
                     contenido = self.estructura_actual.mostrar()
                     if not contenido:
-                        contenido = "Lista vacía"
+                        contenido = "Lista vacia"
             
             self.text_resultado.delete(1.0, tk.END)
-            self.text_resultado.insert(tk.END, f"📊 {self.nombre_estructura}:\n")
+            self.text_resultado.insert(tk.END, f"{self.nombre_estructura}:\n")
             self.text_resultado.insert(tk.END, f"Elementos: {contenido}\n")
-            self.text_resultado.insert(tk.END, f"Tamaño: {self.estructura_actual.tamano()}")
+            self.text_resultado.insert(tk.END, f"Tamano: {self.estructura_actual.tamano()}")
             
-            # Dibujar gráficamente
+            # Dibujar graficamente
             self.dibujar_estructura()
             
         except Exception as e:
@@ -625,7 +634,7 @@ class AplicacionEstructurasGrafica:
                 self.estructura_actual = self.lista_doble
             
             self.mostrar()
-            self.mostrar_mensaje(f"🧹 {self.nombre_estructura} vaciada")
+            self.mostrar_mensaje(f"{self.nombre_estructura} vaciada")
     
     def mostrar_mensaje(self, mensaje):
         self.text_resultado.insert(tk.END, f"\n> {mensaje}")
@@ -635,6 +644,9 @@ class AplicacionEstructurasGrafica:
         self.text_resultado.delete(1.0, tk.END)
 
 if __name__ == "__main__":
+    root = tk.Tk()
+    app = AplicacionEstructurasGrafica(root)
+    root.mainloop()
     root = tk.Tk()
     app = AplicacionEstructurasGrafica(root)
     root.mainloop()
