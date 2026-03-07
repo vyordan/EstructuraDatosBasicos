@@ -484,13 +484,13 @@ class AplicacionEstructurasGrafica:
             valor = int(self.entry_valor.get())
             if self.nombre_estructura == "Pila":
                 self.estructura_actual.apilar(valor)
-                self.mostrar_mensaje(f"✅ Apilado: {valor}")
+                self.mostrar_mensaje(f" Apilado: {valor}")
             elif self.nombre_estructura == "Cola":
                 self.estructura_actual.encolar(valor)
-                self.mostrar_mensaje(f"✅ Encolado: {valor}")
+                self.mostrar_mensaje(f" Encolado: {valor}")
             else:  # Listas
                 self.estructura_actual.insertar_final(valor)
-                self.mostrar_mensaje(f"✅ Insertado: {valor} al final")
+                self.mostrar_mensaje(f" Insertado: {valor} al final")
             
             self.mostrar()
             self.entry_valor.delete(0, tk.END)
